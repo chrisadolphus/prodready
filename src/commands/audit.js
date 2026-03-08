@@ -352,7 +352,7 @@ export async function audit() {
 
   console.log('  ─────────────────────────────────────────');
   console.log('');
-  console.log(`  Security Score: ${scoreColor.bold(score + ' / 100')}  ${scoreBar}`);
+  console.log(`  Overall Score: ${scoreColor.bold(score + ' / 100')}  ${scoreBar}`);
   console.log('');
 
   if (score === 100) {
