@@ -362,16 +362,16 @@ export async function audit() {
     console.log(chalk.yellow(`  ${failed} issue${failed === 1 ? '' : 's'} to fix before you ship.\n`));
   } else if (score >= 50) {
     const failed = results.filter(r => !r.pass).length;
-    console.log(chalk.yellow(`  ${failed} issues found. Run ${chalk.cyan('npx @chris/prodready init')} to add the missing standards.\n`));
+    console.log(chalk.yellow(`  ${failed} issues found. Run ${chalk.cyan('npx @chrisadolphus/prodready init')} to add the missing standards.\n`));
   } else {
-    console.log(chalk.red(`  Critical issues found. Run ${chalk.cyan('npx @chris/prodready init')} to get started.\n`));
+    console.log(chalk.red(`  Critical issues found. Run ${chalk.cyan('npx @chrisadolphus/prodready init')} to get started.\n`));
   }
 
   // Suggest init if templates are missing
   const templateFiles = TEMPLATES.map(t => t.filename);
   const missingTemplates = templateFiles.filter(f => !fileExists(`standards/${f}`) && !fileExists(f));
   if (missingTemplates.length > 0) {
-    console.log(chalk.dim(`  Tip: Run ${chalk.cyan('npx @chris/prodready init')} to add ${missingTemplates.length} missing standard${missingTemplates.length === 1 ? '' : 's'} to your repo.\n`));
+    console.log(chalk.dim(`  Tip: Run ${chalk.cyan('npx @chrisadolphus/prodready init')} to add ${missingTemplates.length} missing standard${missingTemplates.length === 1 ? '' : 's'} to your repo.\n`));
   }
 }
 

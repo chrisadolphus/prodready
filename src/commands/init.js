@@ -73,7 +73,7 @@ export async function init() {
   console.log('');
   console.log(chalk.dim('     "Follow all rules in the standards/ directory of this project"'));
   console.log('');
-  console.log(`  4. Run ${chalk.cyan('npx @chris/prodready audit')} to check your compliance score`);
+  console.log(`  4. Run ${chalk.cyan('npx @chrisadolphus/prodready audit')} to check your compliance score`);
   console.log('');
   console.log(chalk.dim('  Tip: Commit the standards/ directory to version control'));
   console.log(chalk.dim('  so your whole team and all AI agents follow the same rules.'));

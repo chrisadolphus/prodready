@@ -3,7 +3,7 @@ import chalk from './chalk.js';
 export function printHelp() {
   console.log(chalk.bold('  Usage'));
   console.log('');
-  console.log(`  ${chalk.green('npx @chris/prodready')} ${chalk.cyan('<command>')}`);
+  console.log(`  ${chalk.green('npx @chrisadolphus/prodready')} ${chalk.cyan('<command>')}`);
   console.log('');
   console.log(chalk.bold('  Commands'));
   console.log('');
@@ -15,11 +15,11 @@ export function printHelp() {
   console.log('');
   console.log(chalk.bold('  Examples'));
   console.log('');
-  console.log(`  ${chalk.dim('$')} npx @chris/prodready audit`);
-  console.log(`  ${chalk.dim('$')} npx @chris/prodready init`);
-  console.log(`  ${chalk.dim('$')} npx @chris/prodready list`);
-  console.log(`  ${chalk.dim('$')} npx @chris/prodready check`);
+  console.log(`  ${chalk.dim('$')} npx @chrisadolphus/prodready audit`);
+  console.log(`  ${chalk.dim('$')} npx @chrisadolphus/prodready init`);
+  console.log(`  ${chalk.dim('$')} npx @chrisadolphus/prodready list`);
+  console.log(`  ${chalk.dim('$')} npx @chrisadolphus/prodready check`);
   console.log('');
-  console.log(chalk.dim('  GitHub: https://github.com/chris/prodready'));
+  console.log(chalk.dim('  GitHub: https://github.com/chrisadolphus/prodready'));
   console.log('');
 }

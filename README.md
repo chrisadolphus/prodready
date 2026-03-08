@@ -1,4 +1,4 @@
-# @chris/prodready
+# @chrisadolphus/prodready
 
 > Production-grade standards for any repo. Free. Open source. MIT.
 
@@ -10,10 +10,10 @@ Drop 10 comprehensive standard files into any repository in seconds. Audit your 
 
 ```bash
 # Audit your repo — get a score out of 100
-npx @chris/prodready audit
+npx @chrisadolphus/prodready audit
 
 # Install all 10 standard templates
-npx @chris/prodready init
+npx @chrisadolphus/prodready init
 ```
 
 ---
@@ -22,10 +22,10 @@ npx @chris/prodready init
 
 | Command | Description |
 |---------|-------------|
-| `npx @chris/prodready audit` | Scan your repo for missing standards and get a score out of 100 |
-| `npx @chris/prodready init` | Drop all 10 production-grade standard templates into your repo |
-| `npx @chris/prodready list` | Show all available standards and which are installed |
-| `npx @chris/prodready check` | Check if your installed templates are up to date |
+| `npx @chrisadolphus/prodready audit` | Scan your repo for missing standards and get a score out of 100 |
+| `npx @chrisadolphus/prodready init` | Drop all 10 production-grade standard templates into your repo |
+| `npx @chrisadolphus/prodready list` | Show all available standards and which are installed |
+| `npx @chrisadolphus/prodready check` | Check if your installed templates are up to date |
 
 ---
 

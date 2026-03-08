@@ -1,5 +1,5 @@
 {
-  "name": "@chris/prodready",
+  "name": "@chrisadolphus/prodready",
   "version": "1.0.0",
   "description": "Drop production-grade standards into any repository. Audit your codebase. Guide your AI agents to write better code.",
   "type": "module",
@@ -24,11 +24,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/chris/prodready.git"
+    "url": "git+https://github.com/chrisadolphus/prodready.git"
   },
-  "homepage": "https://github.com/chris/prodready#readme",
+  "homepage": "https://github.com/chrisadolphus/prodready#readme",
   "bugs": {
-    "url": "https://github.com/chris/prodready/issues"
+    "url": "https://github.com/chrisadolphus/prodready/issues"
   },
   "engines": {
     "node": ">=18.0.0"

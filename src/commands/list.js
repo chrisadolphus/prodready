@@ -31,8 +31,8 @@ export async function list() {
   if (installedCount === TEMPLATES.length) {
     console.log(chalk.green(`  ✓ All ${TEMPLATES.length} standards installed.\n`));
   } else if (installedCount === 0) {
-    console.log(chalk.dim(`  None installed yet. Run ${chalk.cyan('npx @chris/prodready init')} to install all.\n`));
+    console.log(chalk.dim(`  None installed yet. Run ${chalk.cyan('npx @chrisadolphus/prodready init')} to install all.\n`));
   } else {
-    console.log(chalk.dim(`  ${installedCount} of ${TEMPLATES.length} installed. Run ${chalk.cyan('npx @chris/prodready init')} to install the rest.\n`));
+    console.log(chalk.dim(`  ${installedCount} of ${TEMPLATES.length} installed. Run ${chalk.cyan('npx @chrisadolphus/prodready init')} to install the rest.\n`));
   }
 }

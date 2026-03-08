@@ -16,7 +16,7 @@ export async function check() {
 
   if (!fs.existsSync(standardsDir)) {
     console.log(chalk.yellow('  No standards/ directory found.'));
-    console.log(chalk.dim(`  Run ${chalk.cyan('npx @chris/prodready init')} to get started.\n`));
+    console.log(chalk.dim(`  Run ${chalk.cyan('npx @chrisadolphus/prodready init')} to get started.\n`));
     return;
   }
 
@@ -90,7 +90,7 @@ export async function check() {
       console.log(chalk.red(`  ${missing} standard${missing === 1 ? '' : 's'} missing.`));
     }
     console.log('');
-    console.log(chalk.dim(`  Run ${chalk.cyan('npx @chris/prodready init')} to install missing standards.`));
+    console.log(chalk.dim(`  Run ${chalk.cyan('npx @chrisadolphus/prodready init')} to install missing standards.`));
     console.log(chalk.dim(`  To update outdated files, delete them and run init again.\n`));
   }
 }
