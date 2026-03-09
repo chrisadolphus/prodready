@@ -8,6 +8,55 @@ import { getTemplateById, getTemplateIds, normalizeStandardId, resolveTemplateSe
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TEMPLATES_DIR = path.join(__dirname, '../../templates');
 const CWD = process.cwd();
+const AGENTS_FILE = path.join(CWD, 'AGENTS.md');
+const PRODREADY_START = '<!-- PRODREADY:START -->';
+const PRODREADY_END = '<!-- PRODREADY:END -->';
+
+function escapeRegExp(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function renderAgentsBlock(selectedStandards) {
+  const lines = [
+    PRODREADY_START,
+    '## ProdReady',
+    '',
+    'Follow all rules in the `standards/` directory of this project.',
+    '',
+    'The active ProdReady profile for this repository includes these standards:',
+    ...selectedStandards.map((id) => `- ${id}`),
+    PRODREADY_END,
+  ];
+
+  return `${lines.join('\n')}\n`;
+}
+
+function updateAgentsFile(selectedStandards) {
+  const block = renderAgentsBlock(selectedStandards);
+
+  if (!fs.existsSync(AGENTS_FILE)) {
+    fs.writeFileSync(AGENTS_FILE, block);
+    return { action: 'created' };
+  }
+
+  const current = fs.readFileSync(AGENTS_FILE, 'utf8');
+  const managedPattern = new RegExp(`${escapeRegExp(PRODREADY_START)}[\\s\\S]*?${escapeRegExp(PRODREADY_END)}\\n?`, 'm');
+  let next = current;
+
+  if (current.includes(PRODREADY_START) && current.includes(PRODREADY_END)) {
+    next = current.replace(managedPattern, block);
+  } else {
+    const separator = current.length === 0 ? '' : current.endsWith('\n\n') ? '' : current.endsWith('\n') ? '\n' : '\n\n';
+    next = `${current}${separator}${block}`;
+  }
+
+  if (next === current) {
+    return { action: 'unchanged' };
+  }
+
+  fs.writeFileSync(AGENTS_FILE, next);
+  return { action: 'updated' };
+}
 
 function normalizeSelectionOptions(options) {
   const onlyTokens = String(options.only || '')
@@ -130,6 +179,8 @@ export async function init(options = {}) {
     installed++;
   }
 
+  const agentsResult = updateAgentsFile(selection.selected);
+
   console.log('');
   console.log('  ─────────────────────────────────────────');
   console.log('');
@@ -145,18 +196,22 @@ export async function init(options = {}) {
     console.log(chalk.dim(`  Profile excludes: ${selection.excluded.join(', ')}`));
   }
 
+  if (agentsResult.action === 'created') {
+    console.log(chalk.green(`  ✓ AGENTS.md created with ProdReady instructions`));
+  } else if (agentsResult.action === 'updated') {
+    console.log(chalk.green(`  ✓ AGENTS.md updated with the active standards profile`));
+  } else {
+    console.log(chalk.dim(`  AGENTS.md already reflected the active standards profile`));
+  }
+
   console.log('');
   console.log(chalk.bold('  What to do next:'));
   console.log('');
-  console.log(`  1. Review the files in ${chalk.cyan('standards/')}`);
+  console.log(`  1. Review the files in ${chalk.cyan('standards/')} and ${chalk.cyan('AGENTS.md')}`);
   console.log('  2. Share them with your team and AI coding agents');
-  console.log('  3. In Cursor or Claude Code, reference them in your system prompt:');
+  console.log(`  3. Run ${chalk.cyan('npx @chrisadolphus/prodready audit')} to check your compliance score`);
   console.log('');
-  console.log(chalk.dim('     "Follow all rules in the standards/ directory of this project"'));
-  console.log('');
-  console.log(`  4. Run ${chalk.cyan('npx @chrisadolphus/prodready audit')} to check your compliance score`);
-  console.log('');
-  console.log(chalk.dim('  Tip: Commit the standards/ directory to version control'));
+  console.log(chalk.dim('  Tip: Commit both standards/ and AGENTS.md to version control'));
   console.log(chalk.dim('  so your whole team and all AI agents follow the same rules.'));
   console.log('');
 }

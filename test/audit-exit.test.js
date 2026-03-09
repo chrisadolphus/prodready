@@ -23,6 +23,28 @@ test('default audit exits 0 even with findings', () => {
   assert.equal(result.status, 0, `Expected exit 0, got ${result.status}. stderr: ${result.stderr}`);
 });
 
+test('default text audit includes fix advice for failed checks', () => {
+  const result = runInFixture('audit-fail', []);
+  assert.match(result.stdout, /Fix: Remove plain-text credentials from source and use secure storage and hashing\./);
+});
+
+test('audit omits fix advice when --no-advice is set', () => {
+  const result = runInFixture('audit-fail', ['--no-advice']);
+  assert.doesNotMatch(result.stdout, /Fix:/);
+});
+
+test('json audit output still includes remediation metadata', () => {
+  const result = runInFixture('audit-fail', ['--format', 'json']);
+  const payload = JSON.parse(result.stdout.replace(/^[\s\S]*?(\{\s*"profile")/m, '$1'));
+  const finding = payload.findings.find((entry) => entry.ruleId === 'no-hardcoded-secrets');
+
+  assert.equal(typeof finding?.remediation, 'string');
+  assert.equal(
+    finding?.remediation,
+    'Move secrets to environment variables or a secrets manager and rotate exposed credentials.'
+  );
+});
+
 test('audit fails with explicit fail-on threshold', () => {
   const result = runInFixture('audit-fail', ['--fail-on', 'high']);
   assert.equal(result.status, 1, `Expected exit 1, got ${result.status}. stderr: ${result.stderr}`);

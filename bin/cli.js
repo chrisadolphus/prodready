@@ -21,6 +21,7 @@ switch (command) {
       failOn: options['fail-on'],
       minScore: toNumber(options['min-score']),
       requireCore: toBoolean(options['require-core']),
+      noAdvice: toBoolean(options['no-advice']),
     });
     break;
 

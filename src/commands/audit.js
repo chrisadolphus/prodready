@@ -437,6 +437,7 @@ export async function audit(options = {}) {
   const failOn = normalizeSeverity(options.failOn);
   const minScore = typeof options.minScore === 'number' ? options.minScore : null;
   const requireCore = Boolean(options.requireCore);
+  const showAdvice = format === 'text' && !options.noAdvice;
 
   if (options.failOn && !failOn) {
     const message = `Invalid --fail-on value. Use one of: ${getValidSeverities().join(', ')}, none`;
@@ -490,6 +491,7 @@ export async function audit(options = {}) {
   const score = Math.round((passedWeight / totalWeight) * 100);
 
   const findings = asRuleFindings(rawResults, rulesById, profile.selected);
+  const findingsByRuleId = new Map(findings.map((finding) => [finding.ruleId, finding]));
 
   if (format === 'json') {
     const output = {
@@ -545,6 +547,13 @@ export async function audit(options = {}) {
       const label = check.pass ? chalk.dim(check.label) : chalk.white(check.label);
       const weight = check.pass ? '' : chalk.dim(` [-${check.weight}pts]`);
       console.log(`${icon} ${label}${weight}`);
+
+      if (!check.pass && showAdvice) {
+        const remediation = findingsByRuleId.get(check.id)?.remediation;
+        if (remediation) {
+          console.log(chalk.dim(`       Fix: ${remediation}`));
+        }
+      }
 
       if (!check.pass && check.issues && check.issues.length > 0) {
         for (const issue of check.issues.slice(0, 3)) {
