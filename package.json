@@ -1,6 +1,6 @@
 {
   "name": "@chrisadolphus/prodready",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Drop production-grade standards into any repository. Audit your codebase. Guide your AI agents to write better code.",
   "type": "module",
   "main": "src/index.js",
