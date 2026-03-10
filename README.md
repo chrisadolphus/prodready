@@ -123,6 +123,14 @@ Follow all rules in the standards/ directory of this project.
 
 ---
 
+## Roadmap
+
+See [`docs/ROADMAP.md`](docs/ROADMAP.md) for current priorities and decision rules.
+
+We publish `Now / Next / Later` with explicit `Committed` vs `Exploring` status and weekly stable updates.
+
+---
+
 ## Requirements
 
 - Node.js 18 or higher
