@@ -4,6 +4,17 @@ All notable changes to this project are documented in this file.
 
 The format is based on Keep a Changelog and this project follows Semantic Versioning.
 
+## [Unreleased]
+
+### Added
+- New `audit --agent-prompt` output mode that prints a copy/paste-ready coding-agent prompt (top 3 failed checks, remediation, and path:line evidence).
+- Stronger `audit` config validation for `prodready.json` policy fields and types.
+
+### Changed
+- `init` now validates `prodready.json` before any file writes (fail-fast atomic behavior).
+- `init` now updates CI more safely by avoiding duplicate audit insertion across multiline run blocks and later jobs.
+- Repository CI smoke audit now uses `npx @chrisadolphus/prodready audit` to exercise policy-driven behavior.
+
 ## [1.0.2] - 2026-03-08
 
 ### Added

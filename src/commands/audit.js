@@ -4,6 +4,7 @@ import chalk from '../utils/chalk.js';
 import { TEMPLATES } from '../utils/templates.js';
 import { CORE_STANDARD_IDS, getTemplateIds, inferInstalledStandards, readInstalledProfile } from '../utils/standards.js';
 import { getValidSeverities, loadRules, normalizeSeverity, severityRank } from '../utils/rules.js';
+import { readProdreadyConfig, validateAuditPolicy } from '../utils/config.js';
 
 const CWD = process.cwd();
 const SOURCE_EXTS = ['.js', '.ts', '.jsx', '.tsx', '.py', '.go', '.rb'];
@@ -432,19 +433,115 @@ function shouldFailAudit({ findings, score, failOn, minScore, requireCore, coreM
   return failed;
 }
 
+function selectAgentPromptFindings(findings, maxChecks = 3) {
+  return findings.filter((finding) => finding.status === 'fail').slice(0, maxChecks);
+}
+
+function formatEvidenceRefs(evidence, maxEvidence = 3) {
+  const refs = [];
+  const seen = new Set();
+
+  for (const item of evidence || []) {
+    const ref = item.line ? `${item.file}:${item.line}` : item.file;
+    if (!ref || seen.has(ref)) continue;
+    seen.add(ref);
+    refs.push(ref);
+    if (refs.length >= maxEvidence) break;
+  }
+
+  return refs;
+}
+
+function escapeFenceText(value) {
+  return String(value || '').replace(/```/g, '`` `');
+}
+
+function buildAgentPromptBlock({ selectedFindings }) {
+  const lines = [
+    '```txt',
+    'Fix the following ProdReady audit failures with minimal, safe code changes.',
+    'Keep behavior unchanged except where needed to satisfy the checks.',
+    '',
+    'Targets:',
+  ];
+
+  selectedFindings.forEach((finding, index) => {
+    lines.push(`${index + 1}. [${escapeFenceText(finding.ruleId)}] ${escapeFenceText(finding.label)}`);
+    lines.push(`   Remediation: ${escapeFenceText(finding.remediation || 'Follow the relevant project standard.')}`);
+    const evidenceRefs = formatEvidenceRefs(finding.evidence, 3);
+    if (evidenceRefs.length > 0) {
+      lines.push(`   Evidence: ${evidenceRefs.map((ref) => escapeFenceText(ref)).join(', ')}`);
+    } else {
+      lines.push('   Evidence: (none provided)');
+    }
+  });
+
+  lines.push('');
+  lines.push('After changes:');
+  lines.push('1. Run tests.');
+  lines.push('2. Re-run `npx @chrisadolphus/prodready audit`.');
+  lines.push('3. Summarize what changed and why.');
+  lines.push('```');
+
+  return lines.join('\n');
+}
+
 export async function audit(options = {}) {
   const format = options.format === 'json' ? 'json' : 'text';
-  const failOn = normalizeSeverity(options.failOn);
-  const minScore = typeof options.minScore === 'number' ? options.minScore : null;
-  const requireCore = Boolean(options.requireCore);
+  const cliFailOnProvided = options.failOn !== undefined;
+  const cliMinScoreProvided = options.minScore !== undefined || options.minScoreRaw !== undefined;
+  const cliRequireCoreProvided = options.requireCore !== undefined;
   const showAdvice = format === 'text' && !options.noAdvice;
+  const showAgentPrompt = format === 'text' && Boolean(options.agentPrompt);
 
-  if (options.failOn && !failOn) {
+  const config = readProdreadyConfig(CWD);
+  if (config.error === 'invalid-json') {
+    const message = 'Invalid prodready.json: expected valid JSON.';
+    if (format === 'json') {
+      console.log(JSON.stringify({ error: message }, null, 2));
+    } else {
+      console.error(chalk.red(`  ${message}`));
+    }
+    process.exitCode = 1;
+    return;
+  }
+
+  const configPolicyCandidate = config.data?.auditPolicy;
+  const configPolicy = validateAuditPolicy(configPolicyCandidate);
+  if (config.exists && !configPolicy.valid) {
+    const message = `Invalid prodready.json auditPolicy: ${configPolicy.errors.join('; ')}`;
+    if (format === 'json') {
+      console.log(JSON.stringify({ error: message }, null, 2));
+    } else {
+      console.error(chalk.red(`  ${message}`));
+    }
+    process.exitCode = 1;
+    return;
+  }
+
+  const cliFailOnValue = cliFailOnProvided ? String(options.failOn).toLowerCase() : null;
+  const failOn = cliFailOnProvided
+    ? cliFailOnValue === 'none'
+      ? 'none'
+      : normalizeSeverity(options.failOn)
+    : configPolicy.value.failOn;
+  if (cliFailOnProvided && options.failOn && failOn == null) {
     const message = `Invalid --fail-on value. Use one of: ${getValidSeverities().join(', ')}, none`;
     if (format === 'json') {
       console.log(JSON.stringify({ error: message }, null, 2));
     } else {
       console.error(chalk.red(`  ${message}`));
+    }
+    process.exitCode = 1;
+    return;
+  }
+
+  const minScore = cliMinScoreProvided ? options.minScore : configPolicy.value.minScore;
+  if (cliMinScoreProvided && options.minScore == null && options.minScoreRaw != null) {
+    if (format === 'json') {
+      console.log(JSON.stringify({ error: 'min-score must be a number between 0 and 100.' }, null, 2));
+    } else {
+      console.error(chalk.red('  --min-score must be a number between 0 and 100.'));
     }
     process.exitCode = 1;
     return;
@@ -459,6 +556,7 @@ export async function audit(options = {}) {
     process.exitCode = 1;
     return;
   }
+  const requireCore = cliRequireCoreProvided ? Boolean(options.requireCore) : configPolicy.value.requireCore;
 
   const rules = loadRules();
   const rulesById = new Map(rules.map((rule) => [rule.id, rule]));
@@ -594,4 +692,17 @@ export async function audit(options = {}) {
   const statusText = failed ? chalk.red('FAIL') : chalk.green('PASS');
   console.log(`  Result: ${statusText} ${chalk.dim(`(exit ${exitCode})`)}`);
   console.log('');
+
+  if (showAgentPrompt) {
+    const selectedFindings = selectAgentPromptFindings(findings, 3);
+    if (selectedFindings.length === 0) {
+      console.log(chalk.dim('  No failed checks to generate an agent prompt.'));
+      console.log('');
+    } else {
+      console.log(chalk.bold('  Copy/Paste for Coding Agent'));
+      console.log('');
+      console.log(buildAgentPromptBlock({ selectedFindings }));
+      console.log('');
+    }
+  }
 }

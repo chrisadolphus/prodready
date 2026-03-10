@@ -8,7 +8,7 @@ export function printHelp() {
   console.log(chalk.bold('  Commands'));
   console.log('');
   console.log(`  ${chalk.cyan('audit')}    Scan your repo for standards compliance and score`);
-  console.log(`           ${chalk.dim('--format text|json --fail-on <low|medium|high|critical|none> --min-score <0-100> --require-core --no-advice')}`);
+  console.log(`           ${chalk.dim('--format text|json --fail-on <low|medium|high|critical|none> --min-score <0-100> --require-core --no-advice --agent-prompt')}`);
   console.log(`  ${chalk.cyan('init')}     Install standards templates`);
   console.log(`           ${chalk.dim('--only <csv> --exclude <csv> --auto --yes')}`);
   console.log(`  ${chalk.cyan('list')}     Show all available standard templates`);
@@ -19,8 +19,10 @@ export function printHelp() {
   console.log('');
   console.log(`  ${chalk.dim('$')} npx @chrisadolphus/prodready init --auto`);
   console.log(`  ${chalk.dim('$')} npx @chrisadolphus/prodready init --only security,privacy,reliability`);
+  console.log(`  ${chalk.dim('$')} # thresholds can live in ./prodready.json for local + CI reuse`);
   console.log(`  ${chalk.dim('$')} npx @chrisadolphus/prodready audit --format json --fail-on high --min-score 85 --require-core`);
   console.log(`  ${chalk.dim('$')} npx @chrisadolphus/prodready audit --no-advice`);
+  console.log(`  ${chalk.dim('$')} npx @chrisadolphus/prodready audit --agent-prompt`);
   console.log('');
   console.log(chalk.dim('  GitHub: https://github.com/chrisadolphus/prodready'));
   console.log('');

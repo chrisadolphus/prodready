@@ -15,4 +15,5 @@ test('help output documents audit no-advice flag', () => {
 
   assert.equal(result.status, 0);
   assert.match(result.stdout, /--no-advice/);
+  assert.match(result.stdout, /--agent-prompt/);
 });

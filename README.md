@@ -35,6 +35,7 @@ npx @chrisadolphus/prodready audit
 | `npx @chrisadolphus/prodready init --auto` | Detect and install likely-relevant standards |
 | `npx @chrisadolphus/prodready audit` | Run standards checks and show score |
 | `npx @chrisadolphus/prodready audit --no-advice` | Hide fix advice from text output |
+| `npx @chrisadolphus/prodready audit --agent-prompt` | Print a copy/paste prompt for coding agents |
 | `npx @chrisadolphus/prodready audit --format json` | Machine-readable findings |
 | `npx @chrisadolphus/prodready audit --fail-on high --min-score 85 --require-core` | CI enforcement mode |
 | `npx @chrisadolphus/prodready list` | Show standards and profile status |
@@ -61,19 +62,43 @@ Core standards for CI gating are: `SECURITY`, `PRIVACY`, `RELIABILITY`, `DOCUMEN
 
 ## CI Enforcement
 
-Use pinned versions in CI for reproducibility:
+Set your audit policy once in `prodready.json`:
+
+```json
+{
+  "auditPolicy": {
+    "failOn": "high",
+    "minScore": 85,
+    "requireCore": true
+  }
+}
+```
+
+Then run plain audit in CI so both local and CI share the same thresholds:
 
 ```yaml
 - name: Audit standards
-  run: npx @chrisadolphus/prodready@1.0.1 audit --fail-on high --min-score 85 --require-core
+  run: npx @chrisadolphus/prodready audit
 ```
 
-Recommended behavior:
-- `--fail-on high`: fail on high/critical violations.
-- `--min-score 85`: keep profile quality bar explicit.
-- `--require-core`: block score gaming by excluding core standards.
+CLI flags still override config when explicitly passed.
 
 Text-mode audits now include a short `Fix:` line for each failed in-scope check. Use `--no-advice` if you want the previous compact output.
+
+Need help applying fixes quickly with an AI coding tool? Run `audit --agent-prompt` to print a concise copy/paste block with the top failed checks, remediation guidance, and file/line evidence references.
+
+Example output:
+
+```txt
+Copy/Paste for Coding Agent
+
+Fix the following ProdReady audit failures with minimal, safe code changes.
+...
+1. [no-plain-passwords] No plain text passwords in code
+   Remediation: Remove plain-text credentials from source and use secure storage and hashing.
+   Evidence: src/index.js:1
+...
+```
 
 ---
 

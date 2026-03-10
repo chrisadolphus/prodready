@@ -11,6 +11,7 @@ import { printBanner } from '../src/utils/banner.js';
 const parsed = parseCliArgs(process.argv.slice(2));
 const command = parsed.command;
 const options = parsed.options;
+const hasOption = (key) => Object.prototype.hasOwnProperty.call(options, key);
 
 printBanner();
 
@@ -18,10 +19,12 @@ switch (command) {
   case 'audit':
     await audit({
       format: options.format,
-      failOn: options['fail-on'],
-      minScore: toNumber(options['min-score']),
-      requireCore: toBoolean(options['require-core']),
-      noAdvice: toBoolean(options['no-advice']),
+      failOn: hasOption('fail-on') ? options['fail-on'] : undefined,
+      minScoreRaw: hasOption('min-score') ? options['min-score'] : undefined,
+      minScore: hasOption('min-score') ? toNumber(options['min-score']) : undefined,
+      requireCore: hasOption('require-core') ? toBoolean(options['require-core']) : undefined,
+      noAdvice: hasOption('no-advice') ? toBoolean(options['no-advice']) : undefined,
+      agentPrompt: hasOption('agent-prompt') ? toBoolean(options['agent-prompt']) : undefined,
     });
     break;
 

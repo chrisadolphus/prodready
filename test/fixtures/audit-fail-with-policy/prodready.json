@@ -1,0 +1,7 @@
+{
+  "auditPolicy": {
+    "failOn": "high",
+    "minScore": 85,
+    "requireCore": true
+  }
+}
