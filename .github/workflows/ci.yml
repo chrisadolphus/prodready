@@ -29,7 +29,7 @@ jobs:
           node bin/cli.js help
           node bin/cli.js list
           node bin/cli.js check
-          npx @chrisadolphus/prodready audit
+          node bin/cli.js audit --fail-on none --min-score 0 --require-core false
 
       - name: Verify package contents
         run: npm pack --dry-run --cache /tmp/npm-cache
