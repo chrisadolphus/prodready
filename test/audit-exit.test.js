@@ -143,6 +143,33 @@ test('audit --agent-prompt includes file:line evidence and excludes snippets', (
 });
 
 test('audit --agent-prompt prints no block when there are no failed checks', () => {
+  const standardsDir = path.join(FIXTURES_DIR, 'audit-pass-email', 'standards');
+  fs.mkdirSync(standardsDir, { recursive: true });
+  fs.writeFileSync(
+    path.join(standardsDir, '.prodready'),
+    JSON.stringify(
+      {
+        version: '1.0.2',
+        installedAt: '2026-03-10T00:00:00.000Z',
+        selectedStandards: ['EMAIL'],
+        excludedStandards: [
+          'SECURITY',
+          'PRIVACY',
+          'AUTHENTICATION',
+          'PAYMENTS',
+          'RELIABILITY',
+          'ACCESSIBILITY',
+          'UX-STATES',
+          'API-DESIGN',
+          'DOCUMENTATION',
+        ],
+        mode: 'only',
+      },
+      null,
+      2
+    )
+  );
+
   const result = runInFixture('audit-pass-email', ['--agent-prompt']);
   assert.equal(result.status, 0);
   assert.match(result.stdout, /No failed checks to generate an agent prompt\./);
