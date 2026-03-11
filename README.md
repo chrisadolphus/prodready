@@ -10,6 +10,12 @@ Drop production standards into your repository, wire them into `AGENTS.md`, and 
 
 ---
 
+## Why Prodready
+
+AI coding agents are force multipliers. But they amplify whatever standards you have. If your standards are vague, your code will be too. Prodready gives your team and your agents an explicit, enforceable quality layer in one command.
+
+---
+
 ## Quick Start
 
 ```bash
